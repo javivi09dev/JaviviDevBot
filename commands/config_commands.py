@@ -25,9 +25,27 @@ async def configurar_canal(interaction: discord.Interaction, tipo: app_commands.
         await interaction.response.send_message(f"✅ Canal de bienvenida configurado en {canal.mention}", ephemeral=True)
     elif tipo.value == "tickets":
         config["ticket_channel"] = canal.id
+        # Verificar que hay categorías configuradas
+        if not config.get("ticket_categories"):
+            await interaction.response.send_message(
+                "⚠️ Primero debes configurar las categorías de tickets usando el comando `/configurar_categoria`.",
+                ephemeral=True
+            )
+            return
+            
         # Crear mensaje de tickets con imagen
         view = TicketView()
-        await canal.send(file=discord.File("assets/tickets.png"), view=view)
+        try:
+            with open("assets/tickets.png", "rb") as f:
+                file = discord.File(f, filename="tickets.png")
+                await canal.send(file=file, view=view)
+        except FileNotFoundError:
+            await interaction.response.send_message(
+                "⚠️ No se encontró la imagen de tickets. Por favor, asegúrate de que existe el archivo 'assets/tickets.png'.",
+                ephemeral=True
+            )
+            return
+            
         await interaction.response.send_message(f"✅ Canal de tickets configurado en {canal.mention}", ephemeral=True)
     elif tipo.value == "announcements":
         config["announcements_channel"] = canal.id
@@ -159,4 +177,24 @@ async def ver_config(interaction: discord.Interaction):
         if categories_text:
             embed.add_field(name="🎫 Categorías de Tickets", value=categories_text, inline=False)
     
-    await interaction.response.send_message(embed=embed, ephemeral=True) 
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.tree.command(name="configurar_categoria", description="Configura una categoría para los tickets")
+@app_commands.describe(
+    nombre="Nombre de la categoría",
+    categoria="La categoría donde se crearán los tickets"
+)
+@app_commands.checks.has_permissions(administrator=True)
+async def configurar_categoria(interaction: discord.Interaction, nombre: str, categoria: discord.CategoryChannel):
+    config = load_config()
+    
+    if "ticket_categories" not in config:
+        config["ticket_categories"] = {}
+    
+    config["ticket_categories"][nombre] = categoria.id
+    save_config(config)
+    
+    await interaction.response.send_message(
+        f"✅ Categoría '{nombre}' configurada en {categoria.mention}",
+        ephemeral=True
+    ) 
