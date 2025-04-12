@@ -30,7 +30,7 @@ async def info(interaction: discord.Interaction):
         value=(
             "• Twitter: [@JaviviDev](https://twitter.com/JaviviDev)\n"
             "• Ko-fi: [JaviviDev](https://ko-fi.com/javividev)\n"
-            "• GitHub: [JaviviDev](https://github.com/JaviviDev)"
+            "• GitHub: [JaviviDev](https://github.com/Javivi09dev)"
         ),
         inline=False
     )

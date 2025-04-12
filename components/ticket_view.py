@@ -53,12 +53,11 @@ class TicketSelect(ui.Select):
         
         # Mensaje en el canal del ticket
         embed = discord.Embed(
-            title="🎫 Ticket de Soporte",
+            title="🎫 Ticket de Pedido",
             description=(
                 f"Bienvenido {interaction.user.mention}!\n\n"
-                "Por favor, describe tu consulta o problema.\n"
-                "Un miembro del staff te atenderá pronto.\n\n"
-                "Para cerrar el ticket, un administrador debe usar el comando `/cerrar_ticket`"
+                "Por favor, describe tu pedido o problema.\n"
+                "Un miembro del staff te atenderá pronto.\n"
             ),
             color=discord.Color.blue()
         )

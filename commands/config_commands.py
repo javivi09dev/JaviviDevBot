@@ -13,7 +13,8 @@ from components.ticket_view import TicketView
     app_commands.Choice(name="Bienvenida", value="welcome"),
     app_commands.Choice(name="Tickets", value="tickets"),
     app_commands.Choice(name="Anuncios", value="announcements"),
-    app_commands.Choice(name="Términos y Condiciones", value="terms")
+    app_commands.Choice(name="Términos y Condiciones", value="terms"),
+    app_commands.Choice(name="Feedback", value="feedback")
 ])
 @app_commands.checks.has_permissions(administrator=True)
 async def configurar_canal(interaction: discord.Interaction, tipo: app_commands.Choice[str], canal: discord.TextChannel):
@@ -81,6 +82,9 @@ async def configurar_canal(interaction: discord.Interaction, tipo: app_commands.
         
         await canal.send(embed=embed)
         await interaction.response.send_message(f"✅ Canal de términos y condiciones configurado en {canal.mention}", ephemeral=True)
+    elif tipo.value == "feedback":
+        config["feedback_channel"] = canal.id
+        await interaction.response.send_message(f"✅ Canal de feedback configurado en {canal.mention}", ephemeral=True)
     
     save_config(config)
 
@@ -129,6 +133,9 @@ async def ver_config(interaction: discord.Interaction):
     if config.get("terms_channel"):
         channel = interaction.guild.get_channel(config["terms_channel"])
         channels_text += f"📜 Términos: {channel.mention if channel else 'No configurado'}\n"
+    if config.get("feedback_channel"):
+        channel = interaction.guild.get_channel(config["feedback_channel"])
+        channels_text += f"📝 Feedback: {channel.mention if channel else 'No configurado'}\n"
     
     embed.add_field(name="📌 Canales", value=channels_text or "No hay canales configurados", inline=False)
     

@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from config.bot import bot
 import asyncio
+from components.feedback_view import FeedbackView
 
 @bot.tree.command(name="cerrar_ticket", description="Cierra el ticket actual")
 @app_commands.checks.has_permissions(administrator=True)
@@ -14,6 +15,13 @@ async def cerrar_ticket(interaction: discord.Interaction):
         )
         return
     
+    # Obtener el usuario que creó el ticket
+    ticket_owner = None
+    for member in interaction.channel.members:
+        if not member.bot:
+            ticket_owner = member
+            break
+
     # Enviar mensaje de confirmación
     await interaction.response.send_message(
         "El ticket se cerrará en 5 segundos...",
@@ -33,6 +41,19 @@ async def cerrar_ticket(interaction: discord.Interaction):
     # Enviar mensaje de cierre
     await interaction.channel.send(embed=embed)
     
+    # Enviar mensaje privado al usuario con el botón de feedback
+    if ticket_owner:
+        try:
+            feedback_embed = discord.Embed(
+                title="📝 Feedback del Ticket",
+                description="¡Gracias por usar nuestro servicio! Por favor, tómate un momento para calificar tu experiencia.",
+                color=discord.Color.green()
+            )
+            view = FeedbackView()
+            await ticket_owner.send(embed=feedback_embed, view=view)
+        except discord.Forbidden:
+            pass  # El usuario tiene los mensajes privados desactivados
+
     # Esperar 5 segundos
     await asyncio.sleep(5)
     

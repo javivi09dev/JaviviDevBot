@@ -6,6 +6,7 @@ import commands.public_commands
 import commands.ticket_commands
 import events.server_events
 from components.ticket_view import TicketView
+from components.feedback_view import FeedbackView
 import os
 from discord import app_commands
 
@@ -14,8 +15,9 @@ async def on_ready():
     print(f'Bot conectado como {bot.user.name}')
     print('------')
     try:
-        # Registrar la vista de tickets
+        # Registrar las vistas
         bot.add_view(TicketView())
+        bot.add_view(FeedbackView())
         synced = await bot.tree.sync()
         print(f'Sincronizado {len(synced)} comandos')
     except Exception as e:
